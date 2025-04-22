@@ -43,5 +43,14 @@
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier ./src --write",
     "deploy": "gh-pages -d dist"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/katwhite/web-larek-frontend.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/katwhite/web-larek-frontend/issues"
+  },
+  "homepage": "https://github.com/katwhite/web-larek-frontend#readme"
 }
