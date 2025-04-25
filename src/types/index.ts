@@ -12,13 +12,8 @@ export interface IProduct {
 export interface ICardsData {
 	cards: IProduct[];
 	preview: string | null;
-	addCard(card: IProduct): void;
-	deleteCard(cardId: string, payload: Function | null): void;
 	getCard(cardId: string): IProduct;
-	checkValidation(data: Record<keyof TCardInfo, string>): boolean;
 }
-
-export type TCardInfo = Pick<IProduct, 'title' | 'image'>;
 
 export interface IBasketModel {
     // items: IBasketItem[];

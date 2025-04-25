@@ -46,14 +46,13 @@ yarn build
 Карточка товара
 
 ```
-export interface ICard {
+export interface IProduct {
     _id: string;
     title: string;
     description: string;
     category: string;
     price: number;
     image: string;
-    added: boolean;
 }
 ```
 
@@ -61,10 +60,12 @@ export interface ICard {
 
 ```
 export interface ICardsData {
-    cards: ICard[];
-    preview: string | null;
-    addCard(card: ICard): void;
-    getCard(cardId: string): ICard;
+	cards: IProduct[];
+	preview: string | null;
+	addCard(card: IProduct): void;
+	deleteCard(cardId: string, payload: Function | null): void;
+	getCard(cardId: string): IProduct;
+	checkValidation(data: Record<keyof TCardInfo, string>): boolean;
 }
 ```
 
@@ -132,12 +133,12 @@ export interface IOrderResult {
 Отвечает за хранение и обновление данных карточек\
 Конструктор класса принимает инстант брокера событий\
 В полях класса хранятся:
-- _cards: ICard[] - массив объектов карточек
+- _cards: IProduct[] - массив объектов карточек
 - _preview: string | null - айди карточки, выбранной для просмотра в модалке
 - events: IEvents - экземпляр EventEmitter'а для работы с событиями
 
 Методы для взаимодействия с данными:
-- setCards(cards: ICard[]): void; - устанавливает карточки в каталог после загрузки из апи
+сеттер и геттер массива карточек и превью
 - getCard(cardId: string): ICard; - возвращает карточку по её айди
 
 #### Класс Basket

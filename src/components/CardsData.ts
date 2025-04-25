@@ -1,6 +1,6 @@
 import {formatNumber} from "../utils/utils";
 import { IEvents } from "./base/events";
-import {IProduct, ICardsData, TCardInfo} from "../types";
+import {IProduct, ICardsData} from "../types";
 
 // export type CatalogChangeEvent = {
 //     catalog: ProductItem[];
@@ -15,7 +15,7 @@ import {IProduct, ICardsData, TCardInfo} from "../types";
 //     category: string;
 // }
 
-export class CardData implements ICardsData {
+export class CardsData implements ICardsData {
     protected _cards: IProduct[];
     protected _preview: string | null;
     protected events: IEvents;
@@ -32,21 +32,6 @@ export class CardData implements ICardsData {
         return this._cards;
     };
 
-    addCard(card: IProduct) {
-        this._cards = [card, ...this._cards]
-        this.events.emit('cards:changed')
-    }
-
-    deleteCard(cardId: string, payload: Function | null = null) {
-        this._cards = this._cards.filter(card => card._id !== cardId);
-
-        if(payload) {
-            payload();
-        } else {
-            this.events.emit('cards:changed')
-        }
-    }
-
     getCard(cardId: string) {
         return this._cards.find((item) => item._id === cardId)
     }
@@ -62,40 +47,6 @@ export class CardData implements ICardsData {
             this.events.emit('card:selected')
         }
     }
-    
-    checkValidation(data: Record<keyof TCardInfo, string>) {
-        //TODO: проверка на то что данные не пустые
-        const isValid = true;
-        return isValid;
-    }
-
-	// checkField(data: { field: keyof TCardInfo; value: string }) {
-	// 	switch (data.field) {
-	// 		case 'name':
-	// 			return this.checkName(data.value);
-	// 		case 'link':
-	// 			return this.checkLink(data.value);
-	// 	}
-	// }
-
-	// checkName(value: string) {
-    //    const result = validate.single(value, constraintsCard.name, );
-    //    if (result) {
-    //     return result[0]
-    //    } else {
-    //     return '';
-    //    }
-                
-	// }
-
-	// checkLink(value: string) {
-    //     const result = validate.single(value, constraintsCard.link, );
-    //     if (result) {
-    //      return result[0]
-    //     } else {
-    //      return '';
-    //     }
-    //  }
 
     get preview () {
         return this._preview;
