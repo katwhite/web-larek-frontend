@@ -1,21 +1,24 @@
 import { IEvents } from "../components/base/events";
 
-export interface ICard {
+export interface IProduct {
     _id: string;
     title: string;
     description: string;
     category: string;
     price: number;
     image: string;
-    added: boolean; 
 }
 
 export interface ICardsData {
-    cards: ICard[];
-    preview: string | null;
-    addCard(card: ICard): void;
-    getCard(cardId: string): ICard;
+	cards: IProduct[];
+	preview: string | null;
+	addCard(card: IProduct): void;
+	deleteCard(cardId: string, payload: Function | null): void;
+	getCard(cardId: string): IProduct;
+	checkValidation(data: Record<keyof TCardInfo, string>): boolean;
 }
+
+export type TCardInfo = Pick<IProduct, 'title' | 'image'>;
 
 export interface IBasketModel {
     // items: IBasketItem[];
@@ -24,7 +27,7 @@ export interface IBasketModel {
     remove(id: string): void;
 }
 
-export type IBasketItem = Pick<ICard, '_id' | 'title' | 'price'>;
+export type IBasketItem = Pick<IProduct, '_id' | 'title' | 'price'>;
 
 export interface IOrderForm {
     email: string;
@@ -34,8 +37,13 @@ export interface IOrderForm {
     checkValidation(data: Record<keyof IOrderForm, string>): boolean;
 }
 
+export interface IOrder extends IOrderForm {
+    items: string[]
+}
+
 export interface IOrderResult {
-    price: number;
+    id: string;
+    total: number;
 }
 
 export interface IView {
