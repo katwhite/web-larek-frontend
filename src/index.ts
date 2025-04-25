@@ -12,6 +12,7 @@ import { Card } from './components/Card';
 import { CardsData } from './components/CardsData';
 
 const events = new EventEmitter();
+events.onAll((event) => console.log(event.eventName, '; ', event.data));
 
 const cardsData = new CardsData(events);
 
@@ -30,7 +31,7 @@ const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
-let card = new Card('card', cloneTemplate(cardCatalogTemplate));
+let card = new Card('card', cloneTemplate(cardCatalogTemplate), events);
 
 const page = new Page(document.body, events);
 // page.catalog.map.card.render();
@@ -54,27 +55,46 @@ const page = new Page(document.body, events);
 //     });
 // });
 
-// page.counter = appData.getClosedLots().length;
-
-// api.getProductList()
-//     .then(appData.setCatalog.bind(appData))
-//     .catch(err => {
-//         console.error(err);
-//     });
+const testCards = [​
+    { category: "софт-скил",
+    description: "Если планируете решать задачи в тренажёре, берите два.",
+    _id: "854cef69-976d-4c2a-a18c-2aa45046c390",
+    image: "https://larek-api.nomoreparties.co/content/weblarek/5_Dots.svg",
+    price: 750,
+    title: "+1 час в сутках"
+    },
+    { category: "другое",
+      description: "Лизните этот леденец, чтобы мгновенно запоминать и узнавать любой цветовой код CSS.",
+        _id: "c101ab44-ed99-4a54-990d-47aa2bb4e7d9",
+        image: "https://larek-api.nomoreparties.co/content/weblarek/Shell.svg",
+        price: 1450,
+        title: "HEX-леденец"
+    },
+    {category: "софт-скил",
+        description: "Будет стоять над душой и не давать прокрастинировать.",
+        _id: "b06cde61-912f-4663-9751-09956c0eed67",
+        image: "https://larek-api.nomoreparties.co/content/weblarek/Asterisk_2.svg",
+        price: null,
+        title: "Мамка-таймер"
+    },
+    { category: "дополнительное",
+        description: "Откройте эти куки, чтобы узнать, какой фреймворк вы должны изучить дальше.",
+        _id: "412bcf81-7e75-4e70-bdb9-d3c73c9803b7",
+        image: "https://larek-api.nomoreparties.co/content/weblarek/Soft_Flower.svg",
+        price: 2500,
+        title: "Фреймворк куки судьбы"
+    }
+];
 
 Promise.all([api.getProductList(),])
     .then(([products, ]) => {
         cardsData.cards = products;
-        console.log(cardsData.cards);
     })
     .catch((err) => {
     console.error(err);
     });
 
-
-// api.getProductList()
-//     .then((products: IProduct[]) => {
-//         cardsData.cards = products;
-//         console.log(cardsData.cards);
-//     })
+const testSection = document.querySelector('.gallery');
+card.setData(testCards[1]);
+testSection.append(card.render());
 

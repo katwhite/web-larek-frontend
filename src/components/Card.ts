@@ -1,6 +1,7 @@
 import {Component} from "./base/Component";
 import { IProduct } from "../types";
 import {bem, createElement, ensureElement, formatNumber} from "../utils/utils";
+import { IEvents } from "./base/events";
 
 interface ICardActions {
     onClick: (event: MouseEvent) => void;
@@ -15,60 +16,54 @@ export interface ICard<T> {
 
 export class Card<T> extends Component<ICard<T>> {
     protected _title: HTMLElement;
+    protected _price: HTMLElement;
+    _id: string;
     protected _image?: HTMLImageElement;
     protected _description?: HTMLElement;
     protected _button?: HTMLButtonElement;
     protected _category?: HTMLButtonElement;
+    protected events: IEvents;
 
-    constructor(protected blockName: string, container: HTMLElement, actions?: ICardActions) {
+    constructor(protected blockName: string, container: HTMLElement, events: IEvents) {
         super(container);
 
         this._title = ensureElement<HTMLElement>(`.${blockName}__title`, container);
         this._image = ensureElement<HTMLImageElement>(`.${blockName}__image`, container);
         this._button = container.querySelector(`.${blockName}__button`);
-        this._description = container.querySelector(`.${blockName}__description`);
+        this._description = container.querySelector(`.${blockName}__text`);
         this._category = container.querySelector(`.${blockName}__category`);
+        this._price = container.querySelector(`.${blockName}__price`);
+        this.events = events;
 
-        if (actions?.onClick) {
-            if (this._button) {
-                this._button.addEventListener('click', actions.onClick);
-            } else {
-                container.addEventListener('click', actions.onClick);
-            }
+        if (this._button) {
+            if (this._button.classList.contains('basket__item-delete'))
+                this._button.addEventListener('click', () => {this.events.emit('card:delete', {card: this})});
+            else
+                this._button.addEventListener('click', () => {this.events.emit('card:add', {card: this})});
+        } else {
+            container.addEventListener('click', () => {this.events.emit('card:select', {card: this})});
         }
+
     }
 
-    set id(value: string) {
-        this.container.dataset.id = value;
+    setData(cardsData: IProduct) {
+        this._id = cardsData._id;
+        this.setImage(this._image, cardsData.image, this.title);
+        this.setText(this._title, cardsData.title);
+        this.setText(this._description, cardsData.description);
+        this.setText(this._price, `${cardsData.price} синапсов`);
+        this.setText(this._category, cardsData.category);
     }
 
     get id(): string {
-        return this.container.dataset.id || '';
-    }
-
-    set title(value: string) {
-        this.setText(this._title, value);
+        return this._id;
     }
 
     get title(): string {
         return this._title.textContent || '';
     }
 
-    set image(value: string) {
-        this.setImage(this._image, value, this.title)
-    }
 
-    set description(value: string | string[]) {
-        if (Array.isArray(value)) {
-            this._description.replaceWith(...value.map(str => {
-                const descTemplate = this._description.cloneNode() as HTMLElement;
-                this.setText(descTemplate, str);
-                return descTemplate;
-            }));
-        } else {
-            this.setText(this._description, value);
-        }
-    }
 }
 
 // export type CatalogItemStatus = {
