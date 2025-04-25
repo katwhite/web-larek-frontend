@@ -46,10 +46,6 @@ export class Card<T> extends Component<ICard<T>> {
 
     }
 
-    setData(cardsData: Partial<IProduct>) {
-        Object.assign(this, cardsData);
-    }
-
     get id(): string {
         return this._id;
     }

@@ -31,10 +31,7 @@ const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
-let card = new Card('card', cloneTemplate(cardCatalogTemplate), events);
 
-const page = new Page(document.body, events);
-// page.catalog.map.card.render();
 
 // const modal = new Modal(ensureElement<HTMLElement>('#modal__container'), events);
 
@@ -94,8 +91,17 @@ Promise.all([api.getProductList(),])
     console.error(err);
     });
 
-const testSection = document.querySelector('.gallery');
-card.setData(testCards[1]);
-card.category = 'новая категория';
-testSection.append(card.render());
+// const testSection = document.querySelector('.gallery');
+// card.category = 'новая категория';
+// testSection.append(card.render());
 
+const page = new Page(document.body, events);
+const card = new Card('card', cloneTemplate(cardCatalogTemplate), events);
+const card1 = new Card('card', cloneTemplate(cardCatalogTemplate), events);
+const cardsArray= [];
+// card.setData(testCards[0]);
+// card1.setData(testCards[1]);
+cardsArray.push(card.render(testCards[0]));
+cardsArray.push(card1.render(testCards[1]));
+
+page.render({catalog: cardsArray});

@@ -132,34 +132,34 @@ export interface IOrderResult {
 
 Расширяет Api. В конструктор добавляется базовый url для загрузки контента.\
 Методы:
-- `getProductItem`(id: string): Promise<IProduct> - 
-- `getProductList`(): Promise<IProduct[]> - возвращает промис с массивом всех товаров
-- `orderProducts`(order: IOrder): Promise<IOrderResult> - отправляет заказ на сервер
+- `getProductItem(id: string): Promise<IProduct>` - 
+- `getProductList(): Promise<IProduct[]>` - возвращает промис с массивом всех товаров
+- `orderProducts(order: IOrder): Promise<IOrderResult>` - отправляет заказ на сервер
 
 #### Класс CardsData
 
 Отвечает за хранение и обновление данных карточек\
 Конструктор класса принимает инстант брокера событий\
 В полях класса хранятся:
-- _cards: IProduct[] - массив объектов карточек
-- _preview: string | null - айди карточки, выбранной для просмотра в модалке
-- events: IEvents - экземпляр EventEmitter'а для работы с событиями
+- `_cards: IProduct[]` - массив объектов карточек
+- `_preview: string | null` - айди карточки, выбранной для просмотра в модалке
+- `events: IEvents` - экземпляр EventEmitter'а для работы с событиями
 
 Методы для взаимодействия с данными:
 сеттер и геттер массива карточек и превью
-- getCard(cardId: string): ICard; - возвращает карточку по её айди
+- `getCard(cardId: string): ICard` - возвращает карточку по её айди
 
 #### Класс Basket?
 
 Отвечает за хранение списка покупок.\
 Конструктор принимает DOM элемент списка по селектору - cейчас это `.basket__list`\
 Поля класса:
-- items: Map<string, number>; - массив объектов карточек
-- basketPrice: number - общая стоимость
+- `items: Map<string, number>` - массив объектов карточек
+- `basketPrice: number` - общая стоимость
 
 Есть геттер и сеттер общей стоимости и следующие методы:
-- add(id: string): void; - добавляет товар в корзину
-- remove(id: string): void; - удаляет товар из корзины
+- `add(id: string): void` - добавляет товар в корзину
+- `remove(id: string): void` - удаляет товар из корзины
 
 #### Класс UserInfo?
 
@@ -169,21 +169,21 @@ export interface IOrderResult {
 
 Отвечает за отображение базового компонента, в конструктор принимает селектор контейнера.\
 Имеет методы для работы с HTML:
-- toggleClass(element: HTMLElement, className: string, force?: boolean) - убирает или добавляет класс элементу
-- setText(element: HTMLElement, value: unknown) - устанавливает текстовое содержимое элемента
-- setDisabled(element: HTMLElement, state: boolean) - блокирует и разблокирует элемент
-- setHidden(element: HTMLElement) - скрывает элемент
-- setVisible(element: HTMLElement) - показывает элемент
-- setImage(element: HTMLImageElement, src: string, alt?: string) - устанавливает изображение
-- render - возвращает корневой дом элемент (например, карточку)
+- `toggleClass(element: HTMLElement, className: string, force?: boolean)` - убирает или добавляет класс элементу
+- `setText(element: HTMLElement, value: unknown)` - устанавливает текстовое содержимое элемента
+- `setDisabled(element: HTMLElement, state: boolean)` - блокирует и разблокирует элемент
+- `setHidden(element: HTMLElement)` - скрывает элемент
+- `setVisible(element: HTMLElement)` - показывает элемент
+- `setImage(element: HTMLImageElement, src: string, alt?: string)` - устанавливает изображение
+- `render` - возвращает корневой дом элемент (например, карточку)
 
 #### Класс Page
 
-Расширяет Component. Принимает контейнер и брокер событий в конструктор. Имеет поля:
-- _counter: HTMLElement; - счётчик покупок
-- _catalog: HTMLElement;
-- _wrapper: HTMLElement;
-- _basket: HTMLElement;
+Расширяет Component. Отвечает за отрисовку страницы. Принимает контейнер и брокер событий в конструктор. Имеет поля:
+- `_counter: HTMLElement` - счётчик покупок
+- `_catalog: HTMLElement` - обёртка для каталога карточек
+- `_wrapper: HTMLElement` - обёртка всей страницы
+- `_basket: HTMLElement` - корзина
 
 Имеет сеттер счётчика, каталога, и блокировки страницы (boolean) при открытии модального окна
 
@@ -191,21 +191,13 @@ export interface IOrderResult {
 
 Расширяет Component. Отвечает за отображение одной карточки. В конструктор передаётся брокер событий и темплейт.\
 Поля:
-- id
-- title
-- price
-- category
-- image
-- description
-
-Методы:
-- setData(cardsData: IProduct): void - заполняет темплейт данными
-геттер id возвращает id карточки, сеттеры остальных полей используются для быстрого апдейта информации
-
-#### Класс CardContainer
-
-Расширяет Component. Отвечает за отрисовку каталога карточек. В конструктор передаётся контейнер gallery, в котором размещаются карточки\
-Имеет сеттер container и метод `addCard` для добавления карточки в каталог
+- `id`
+- `title`
+- `price`
+- `category`
+- `image`
+- `description`
+Есть геттер id, который возвращает id карточки, и сеттеры остальных полей используются для быстрого апдейта информации
 
 #### Класс BasketItemView
 
