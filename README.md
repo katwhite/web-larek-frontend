@@ -128,6 +128,14 @@ export interface IOrderResult {
 
 ### Слой данных
 
+#### Класс LarekApi
+
+Расширяет Api. В конструктор добавляется базовый url для загрузки контента.\
+Методы:
+- `getProductItem`(id: string): Promise<IProduct> - 
+- `getProductList`(): Promise<IProduct[]> - возвращает промис с массивом всех товаров
+- `orderProducts`(order: IOrder): Promise<IOrderResult> - отправляет заказ на сервер
+
 #### Класс CardsData
 
 Отвечает за хранение и обновление данных карточек\

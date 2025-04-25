@@ -62,9 +62,19 @@ const page = new Page(document.body, events);
 //         console.error(err);
 //     });
 
-api.getProductList()
-    .then((products: IProduct[]) => {
+Promise.all([api.getProductList(),])
+    .then(([products, ]) => {
         cardsData.cards = products;
         console.log(cardsData.cards);
     })
+    .catch((err) => {
+    console.error(err);
+    });
+
+
+// api.getProductList()
+//     .then((products: IProduct[]) => {
+//         cardsData.cards = products;
+//         console.log(cardsData.cards);
+//     })
 
