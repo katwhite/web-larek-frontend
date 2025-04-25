@@ -96,5 +96,6 @@ Promise.all([api.getProductList(),])
 
 const testSection = document.querySelector('.gallery');
 card.setData(testCards[1]);
+card.category = 'новая категория';
 testSection.append(card.render());
 

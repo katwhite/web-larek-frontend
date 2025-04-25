@@ -46,13 +46,8 @@ export class Card<T> extends Component<ICard<T>> {
 
     }
 
-    setData(cardsData: IProduct) {
-        this._id = cardsData._id;
-        this.setImage(this._image, cardsData.image, this.title);
-        this.setText(this._title, cardsData.title);
-        this.setText(this._description, cardsData.description);
-        this.setText(this._price, `${cardsData.price} синапсов`);
-        this.setText(this._category, cardsData.category);
+    setData(cardsData: Partial<IProduct>) {
+        Object.assign(this, cardsData);
     }
 
     get id(): string {
@@ -63,6 +58,29 @@ export class Card<T> extends Component<ICard<T>> {
         return this._title.textContent || '';
     }
 
+    set id(id: string) {
+        this._id = id;
+    }
+
+    set title(title: string) {
+        this.setText(this._title, title);
+    }
+
+    set description(description: string) {
+        this.setText(this._description, description);
+    }
+
+    set price(price: string) {
+        this.setText(this._price, `${price} синапсов`);
+    }
+
+    set category(category: string) {
+        this.setText(this._category, category);
+    }
+
+    set image(imglink: string) {
+        this.setImage(this._image, imglink, this.title)
+    }
 
 }
 

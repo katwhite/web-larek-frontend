@@ -175,7 +175,7 @@ export interface IOrderResult {
 - setHidden(element: HTMLElement) - скрывает элемент
 - setVisible(element: HTMLElement) - показывает элемент
 - setImage(element: HTMLImageElement, src: string, alt?: string) - устанавливает изображение
-- render - возвращает корневой дом элемент
+- render - возвращает корневой дом элемент (например, карточку)
 
 #### Класс Page
 
@@ -194,23 +194,13 @@ export interface IOrderResult {
 - id
 - title
 - price
-
-Методы:
-- setData(cardData: ICard): void - заполняет темплейт данными
-- render(): HTMLElement - отрисовывает разметку карточки
-
-геттер id возвращает id карточки
-
-#### Класс CardCatalog
-
-Расширяет Card. Устанавливается слушатель клика на карточку для открытия модального окна\
-Добавляются поля:
 - category
 - image
+- description
 
-#### Класс CardPreview
-
-Расширяет CardCatalog. Добавляется поле `description`.
+Методы:
+- setData(cardsData: IProduct): void - заполняет темплейт данными
+геттер id возвращает id карточки, сеттеры остальных полей используются для быстрого апдейта информации
 
 #### Класс CardContainer
 
