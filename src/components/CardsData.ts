@@ -26,14 +26,15 @@ export class CardsData implements ICardsData {
     
     set cards(cards: IProduct[]) {
         this._cards = cards;
-        this.events.emit('cards:changed');
+        this.events.emit('initialData:loaded');
     };
+
     get cards() {
         return this._cards;
     };
 
     getCard(cardId: string) {
-        return this._cards.find((item) => item._id === cardId)
+        return this._cards.find((item) => item.id === cardId)
     }
 
     set preview(cardId: string | null) {

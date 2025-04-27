@@ -36,7 +36,6 @@ const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 Promise.all([api.getProductList(), ])
     .then(([products, ]) => {
         cardsData.cards = products;
-        events.emit('initialData:loaded');
     })
     .catch((err) => {
     console.error(err);
@@ -55,41 +54,39 @@ events.on('initialData:loaded', () => {
 events.on<{ cardId: string }>('card:select', ({cardId}) => {
     console.log(cardsData.getCard('c101ab44-ed99-4a54-990d-47aa2bb4e7d9'));
     const cardInstant = new Card('card', cloneTemplate(cardPreviewTemplate), events);
-    // const cardInModal = cardInstant.render(card);
-    modal.content = cardInstant.render(cardsData.getCard(cardId));
-    modal.render({content: modal.content});
+    modal.render({content: cardInstant.render(cardsData.getCard(cardId))});
 })
 
-const testCards = new CardsData(events);
-testCards.cards = [​
-    { category: "софт-скил",
-    description: "Если планируете решать задачи в тренажёре, берите два.",
-    _id: "854cef69-976d-4c2a-a18c-2aa45046c390",
-    image: "https://larek-api.nomoreparties.co/content/weblarek/5_Dots.svg",
-    price: 750,
-    title: "+1 час в сутках"
-    },
-    { category: "другое",
-      description: "Лизните этот леденец, чтобы мгновенно запоминать и узнавать любой цветовой код CSS.",
-        _id: "c101ab44-ed99-4a54-990d-47aa2bb4e7d9",
-        image: "https://larek-api.nomoreparties.co/content/weblarek/Shell.svg",
-        price: 1450,
-        title: "HEX-леденец"
-    },
-    {category: "софт-скил",
-        description: "Будет стоять над душой и не давать прокрастинировать.",
-        _id: "b06cde61-912f-4663-9751-09956c0eed67",
-        image: "https://larek-api.nomoreparties.co/content/weblarek/Asterisk_2.svg",
-        price: null,
-        title: "Мамка-таймер"
-    },
-    { category: "дополнительное",
-        description: "Откройте эти куки, чтобы узнать, какой фреймворк вы должны изучить дальше.",
-        _id: "412bcf81-7e75-4e70-bdb9-d3c73c9803b7",
-        image: "https://larek-api.nomoreparties.co/content/weblarek/Soft_Flower.svg",
-        price: 2500,
-        title: "Фреймворк куки судьбы"
-    }
-];
-console.log(testCards.getCard('412bcf81-7e75-4e70-bdb9-d3c73c9803b7'));
-console.log(testCards);
+// const testCards = new CardsData(events);
+// testCards.cards = [​
+//     { category: "софт-скил",
+//     description: "Если планируете решать задачи в тренажёре, берите два.",
+//     _id: "854cef69-976d-4c2a-a18c-2aa45046c390",
+//     image: "https://larek-api.nomoreparties.co/content/weblarek/5_Dots.svg",
+//     price: 750,
+//     title: "+1 час в сутках"
+//     },
+//     { category: "другое",
+//       description: "Лизните этот леденец, чтобы мгновенно запоминать и узнавать любой цветовой код CSS.",
+//         _id: "c101ab44-ed99-4a54-990d-47aa2bb4e7d9",
+//         image: "https://larek-api.nomoreparties.co/content/weblarek/Shell.svg",
+//         price: 1450,
+//         title: "HEX-леденец"
+//     },
+//     {category: "софт-скил",
+//         description: "Будет стоять над душой и не давать прокрастинировать.",
+//         _id: "b06cde61-912f-4663-9751-09956c0eed67",
+//         image: "https://larek-api.nomoreparties.co/content/weblarek/Asterisk_2.svg",
+//         price: null,
+//         title: "Мамка-таймер"
+//     },
+//     { category: "дополнительное",
+//         description: "Откройте эти куки, чтобы узнать, какой фреймворк вы должны изучить дальше.",
+//         _id: "412bcf81-7e75-4e70-bdb9-d3c73c9803b7",
+//         image: "https://larek-api.nomoreparties.co/content/weblarek/Soft_Flower.svg",
+//         price: 2500,
+//         title: "Фреймворк куки судьбы"
+//     }
+// ];
+// console.log(testCards.getCard('412bcf81-7e75-4e70-bdb9-d3c73c9803b7'));
+// console.log(testCards);

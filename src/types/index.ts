@@ -1,7 +1,7 @@
 import { IEvents } from "../components/base/events";
 
 export interface IProduct {
-    _id: string;
+    id: string;
     title: string;
     description: string;
     category: string;
@@ -22,7 +22,7 @@ export interface IBasketModel {
     remove(id: string): void;
 }
 
-export type IBasketItem = Pick<IProduct, '_id' | 'title' | 'price'>;
+export type IBasketItem = Pick<IProduct, 'id' | 'title' | 'price'>;
 
 export interface IOrderForm {
     email: string;
