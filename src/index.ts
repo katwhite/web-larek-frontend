@@ -10,6 +10,7 @@ import { Basket } from './components/Basket';
 import { IProduct } from './types';
 import { Card } from './components/Card';
 import { CardsData } from './components/CardsData';
+import { BasketModel } from './components/BasketModel';
 
 const events = new EventEmitter();
 events.onAll((event) => console.log(event.eventName, '; ', event.data));
@@ -53,12 +54,28 @@ events.on('initialData:loaded', () => {
 })
 
 events.on<{ cardId: string }>('card:select', ({cardId}) => {
-    console.log(cardsData.getCard('c101ab44-ed99-4a54-990d-47aa2bb4e7d9'));
     const cardInstant = new Card('card', cloneTemplate(cardPreviewTemplate), events);
     modal.render({content: cardInstant.render(cardsData.getCard(cardId))});
 })
 
+const basketData = new BasketModel(events);
+
+events.on<{ cardId: string }>('card:add', ({cardId}) => {
+    basketData.add(cardsData.getCard(cardId));
+    console.log(basketData);
+})
+
+// events.on<{ cardId: string }>('card:delete', ({cardId}) => {
+//     basketData.remove(cardId);
+//     // console.log(basketData);
+// })
+
+const basket = new Basket(cloneTemplate(basketTemplate), events);
+
 events.on('basket:open', () => {
-    const basketInstant = new Basket(cloneTemplate(basketTemplate), events);
-    modal.render({content: basketInstant.render()});
+    const cardsArray = basketData.items.map((card) => {
+        const cardInstant = new Card('card', cloneTemplate(cardBasketTemplate), events);
+        return cardInstant.render(card);
+    });
+    modal.render({content: basket.render({items: cardsArray})});
 })

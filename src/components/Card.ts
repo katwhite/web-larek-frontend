@@ -14,6 +14,14 @@ export interface ICard<T> {
     category: string;
 }
 
+const categoryClassMap: Record<string, string> = {
+    'cофт-скил': 'soft',
+    'хард-скил': 'hard',
+    'другое': 'other',
+    'дополнительное': 'additional',
+    'кнопка': 'button',
+};
+
 export class Card<T> extends Component<ICard<T>> {
     protected _title: HTMLElement;
     protected _price: HTMLElement;
@@ -28,11 +36,11 @@ export class Card<T> extends Component<ICard<T>> {
         super(container);
 
         this._title = ensureElement<HTMLElement>(`.${blockName}__title`, container);
-        this._image = ensureElement<HTMLImageElement>(`.${blockName}__image`, container);
+        this._image = container.querySelector(`.${blockName}__image`);
         this._button = container.querySelector(`.${blockName}__button`);
         this._description = container.querySelector(`.${blockName}__text`);
         this._category = container.querySelector(`.${blockName}__category`);
-        this._price = container.querySelector(`.${blockName}__price`);
+        this._price = ensureElement<HTMLImageElement>(`.${blockName}__price`, container);
         this.events = events;
 
         if (this._button) {
@@ -81,6 +89,14 @@ export class Card<T> extends Component<ICard<T>> {
 
     set image(imglink: string) {
         this.setImage(this._image, imglink, this.title)
+    }
+
+    render(data: Partial<IProduct>): HTMLElement {
+        super.render(data);
+        if (this._category) {
+            this.toggleClass(this._category, `card__category_${categoryClassMap[data.category]}`, true);
+        }
+        return this.container;
     }
 
 }
