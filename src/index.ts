@@ -31,28 +31,37 @@ const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
+const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 
+Promise.all([api.getProductList(), ])
+    .then(([products, ]) => {
+        cardsData.cards = products;
+        events.emit('initialData:loaded');
+    })
+    .catch((err) => {
+    console.error(err);
+    });
 
-// const modal = new Modal(ensureElement<HTMLElement>('#modal__container'), events);
+const page = new Page(document.body, events);
 
-// const basket = new Basket(cloneTemplate(basketTemplate), events);
+events.on('initialData:loaded', () => {
+    const cardsArray = cardsData.cards.map((card) => {
+        const cardInstant = new Card('card', cloneTemplate(cardCatalogTemplate), events);
+        return cardInstant.render(card);
+    });
+    page.render({catalog: cardsArray});
+})
 
-// page.catalog = appData.catalog.map(item => {
-//     const card = new CatalogItem(cloneTemplate(cardCatalogTemplate), {
-//         onClick: () => events.emit('card:select', item)
-//     });
-//     return card.render({
-//         title: item.title,
-//         image: item.image,
-//         description: item.about,
-//         status: {
-//             status: item.status,
-//             label: item.statusLabel
-//         },
-//     });
-// });
+events.on<{ cardId: string }>('card:select', ({cardId}) => {
+    console.log(cardsData.getCard('c101ab44-ed99-4a54-990d-47aa2bb4e7d9'));
+    const cardInstant = new Card('card', cloneTemplate(cardPreviewTemplate), events);
+    // const cardInModal = cardInstant.render(card);
+    modal.content = cardInstant.render(cardsData.getCard(cardId));
+    modal.render({content: modal.content});
+})
 
-const testCards = [​
+const testCards = new CardsData(events);
+testCards.cards = [​
     { category: "софт-скил",
     description: "Если планируете решать задачи в тренажёре, берите два.",
     _id: "854cef69-976d-4c2a-a18c-2aa45046c390",
@@ -82,26 +91,5 @@ const testCards = [​
         title: "Фреймворк куки судьбы"
     }
 ];
-
-Promise.all([api.getProductList(),])
-    .then(([products, ]) => {
-        cardsData.cards = products;
-    })
-    .catch((err) => {
-    console.error(err);
-    });
-
-// const testSection = document.querySelector('.gallery');
-// card.category = 'новая категория';
-// testSection.append(card.render());
-
-const page = new Page(document.body, events);
-const card = new Card('card', cloneTemplate(cardCatalogTemplate), events);
-const card1 = new Card('card', cloneTemplate(cardCatalogTemplate), events);
-const cardsArray= [];
-// card.setData(testCards[0]);
-// card1.setData(testCards[1]);
-cardsArray.push(card.render(testCards[0]));
-cardsArray.push(card1.render(testCards[1]));
-
-page.render({catalog: cardsArray});
+console.log(testCards.getCard('412bcf81-7e75-4e70-bdb9-d3c73c9803b7'));
+console.log(testCards);

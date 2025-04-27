@@ -165,9 +165,9 @@ export interface IOrderResult {
 
 ### Слой представления
 
-#### Абстракстный класс Component
+#### Абстрактный класс Component
 
-Отвечает за отображение базового компонента, в конструктор принимает селектор контейнера.\
+Является дженериком, отвечает за отображение базового компонента и является родителем всех классов представления. В конструктор принимает селектор контейнера, в женерик принимает тип объекта, передаёт этот тип в метод `render`.\
 Имеет методы для работы с HTML:
 - `toggleClass(element: HTMLElement, className: string, force?: boolean)` - убирает или добавляет класс элементу
 - `setText(element: HTMLElement, value: unknown)` - устанавливает текстовое содержимое элемента
@@ -185,7 +185,8 @@ export interface IOrderResult {
 - `_wrapper: HTMLElement` - обёртка всей страницы
 - `_basket: HTMLElement` - корзина
 
-Имеет сеттер счётчика, каталога, и блокировки страницы (boolean) при открытии модального окна
+Имеет сеттер счётчика, каталога, и блокировки страницы (boolean) при открытии модального окна.\
+В `render` принимает объект, ключ - контейнер. Например: `page.render({catalog: cardsArray})`
 
 #### Класс Card
 
@@ -197,7 +198,8 @@ export interface IOrderResult {
 - `category`
 - `image`
 - `description`
-Есть геттер id, который возвращает id карточки, и сеттеры остальных полей используются для быстрого апдейта информации
+Есть геттер id, который возвращает id карточки, и сеттеры остальных полей используются для быстрого апдейта информации.\
+В `render` принимает объект карточки.
 
 #### Класс BasketItemView
 
@@ -213,49 +215,49 @@ export interface IOrderResult {
 Конструктор принимает селектор с айди из темплейта и брокер событий
 
 Имеет поля:
-- modal: HTMLElement - элемент модального окна
-- events: IEvents - события
-- button: HTMLButtonElement | null - элемент кнопки, на которую будем вешать слушатели; в макете у всех модалок есть кнопка, но в будущем может появиться окно без неё
+- `modal: HTMLElement` - элемент модального окна
+- `events: IEvents` - события
+- `button: HTMLButtonElement | null` - элемент кнопки, на которую будем вешать слушатели; в макете у всех модалок есть кнопка, но в будущем может появиться окно без неё
 
 Методы:
-- open(): void
-- close(): void
+- `open(): void`
+- `close(): void`
 
 #### Класс ModalWithCard
 
 Расширяет класс Modal. Реализует модальное окно с полным отображением карточки.\
 Содержит поля:
-- card: ICard - отображаемая карточка - нужно брать темплейт card-preview
+- `card: ICard` - отображаемая карточка - нужно брать темплейт card-preview
 
 Методы:
-- open(id: string) - для открытия модального окна с карточкой по айди
+- `open(id: string)` - для открытия модального окна с карточкой по айди
 
 #### Класс ModalWithForm
 
 Расширяет класс Modal. Реализует модальное окно с формой.\
 Содержит поля:
-- errors: Record<string, HTMLElement> - элементы для отображения ошибок валидации, привязан к name инпутов
-- inputs: NodeListOf<HTMLInputElement> - коллекция полей ввода 
+- `errors: Record<string, HTMLElement>` - элементы для отображения ошибок валидации, привязан к name инпутов
+- `inputs: NodeListOf<HTMLInputElement>` - коллекция полей ввода 
 
 Методы:
-- setValid(): boolean - делает кнопку активной или неактивной
-- getInputValues(): Record<string, string> - возвращает объект с данными из полей ввода формы. Ключ - name инпута, значение - введённые данные
-- setInputValues(data: Record<string, string>): void - позволяет заполинть поля принятыми данными; в макете такого нет, но пригодится при расширении проекта
-- setError(data: {field: string, value: string, validInformation: string}): void - принимает объект с сообщениями об ошибках и нужными полями
-- showInputError(field: string, errorMessage: string): void - отображает нужное сообщение об ошибке под выбранным полем
-- hideInputError(field: string): void - убирает сообщение об ошибке под выбранным полем
+- `setValid(): boolean` - делает кнопку активной или неактивной
+- `getInputValues(): Record<string, string>` - возвращает объект с данными из полей ввода формы. Ключ - name инпута, значение - введённые данные
+- `setInputValues(data: Record<string, string>): void` - позволяет заполинть поля принятыми данными; в макете такого нет, но пригодится при расширении проекта
+- `setError(data: {field: string, value: string, validInformation: string}): void` - принимает объект с сообщениями об ошибках и нужными полями
+- `showInputError(field: string, errorMessage: string): void` - отображает нужное сообщение об ошибке под выбранным полем
+- `hideInputError(field: string): void` - убирает сообщение об ошибке под выбранным полем
 
 #### Класс Form
 
 Расширяет Component. Отвечает за отображение элементов формы\
 Конструктор принимает контейнер и инстант брокера событий\
 В полях класса хранятся:
-- button: HTMLButtonElement - кнопка перехода на следующее окно
-- errors: HTMLElement - элемент для вывода ошибок валидации
+- `button: HTMLButtonElement` - кнопка перехода на следующее окно
+- `errors: HTMLElement` - элемент для вывода ошибок валидации
 
 Метод для проверки корректности введённых данных:
-- checkValidation(data: Record<keyof IOrderForm, string>): boolean;
-- onInputChange(field: keyof T, value: string)
+- `checkValidation(data: Record<keyof IOrderForm, string>): boolean`
+- `onInputChange(field: keyof T, value: string)`
 
 #### Класс Order
 
@@ -265,19 +267,20 @@ export interface IOrderResult {
 
 Расширяет класс Modal. Реализует модальное окно с подтверждением заказа.\
 Содержит поля:
-- price: number - общая цена
+- `price: number` - общая цена
 
 #### Класс ModalWithBasket
 
 Расширяет класс Modal. Реализует модальное окно с корзиной.\
 Содержит поля:
-- cardItem: IBasketItem - берёт темплейт card-basket
+- `cardItem: IBasketItem` - берёт темплейт card-basket
 
 ### Слой коммуникации
 
 `index.ts` выполняет роль презентера. В нём создаются экземпляры классов, затем настраивается обработка событий\
 #### *Список возможных событий:*
 *События изменения данных:*
+- `initialData:loaded` - загрузка карточек из апи
 - `cards:changed` - изменение списка карточек
 - `card:add` - добавление карточки в корзину (изменяется кнопка на отображении карточки и список покупок)
 - `card:delete` - удаление карточки из корзины

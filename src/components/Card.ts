@@ -37,11 +37,14 @@ export class Card<T> extends Component<ICard<T>> {
 
         if (this._button) {
             if (this._button.classList.contains('basket__item-delete'))
-                this._button.addEventListener('click', () => {this.events.emit('card:delete', {card: this})});
+                this._button.addEventListener('click', (evt) => {
+                    this.events.emit('card:delete', {card: this});
+                    evt.stopPropagation();
+                });
             else
                 this._button.addEventListener('click', () => {this.events.emit('card:add', {card: this})});
         } else {
-            container.addEventListener('click', () => {this.events.emit('card:select', {card: this})});
+            container.addEventListener('click', () => {this.events.emit('card:select', {cardId: this.id})});
         }
 
     }
