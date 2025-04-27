@@ -47,7 +47,7 @@ yarn build
 
 ```
 export interface IProduct {
-    _id: string;
+    id: string;
     title: string;
     description: string;
     category: string;

@@ -38,11 +38,11 @@ export class Card<T> extends Component<ICard<T>> {
         if (this._button) {
             if (this._button.classList.contains('basket__item-delete'))
                 this._button.addEventListener('click', (evt) => {
-                    this.events.emit('card:delete', {card: this});
+                    this.events.emit('card:delete', {cardId: this.id});
                     evt.stopPropagation();
                 });
             else
-                this._button.addEventListener('click', () => {this.events.emit('card:add', {card: this})});
+                this._button.addEventListener('click', () => {this.events.emit('card:add', {cardId: this.id})});
         } else {
             container.addEventListener('click', () => {this.events.emit('card:select', {cardId: this.id})});
         }
@@ -69,8 +69,10 @@ export class Card<T> extends Component<ICard<T>> {
         this.setText(this._description, description);
     }
 
-    set price(price: string) {
+    set price(price: string | null) {
+        if (price)
         this.setText(this._price, `${price} синапсов`);
+        else this.setText(this._price, `бесценно`);
     }
 
     set category(category: string) {
