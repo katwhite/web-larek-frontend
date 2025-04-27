@@ -65,10 +65,11 @@ events.on<{ cardId: string }>('card:add', ({cardId}) => {
     console.log(basketData);
 })
 
-// events.on<{ cardId: string }>('card:delete', ({cardId}) => {
-//     basketData.remove(cardId);
-//     // console.log(basketData);
-// })
+events.on<{ cardId: string }>('card:delete', ({cardId}) => {
+    basketData.remove(cardId);
+    events.emit('basket:open');
+    // console.log(basketData);
+})
 
 const basket = new Basket(cloneTemplate(basketTemplate), events);
 
@@ -78,4 +79,8 @@ events.on('basket:open', () => {
         return cardInstant.render(card);
     });
     modal.render({content: basket.render({items: cardsArray})});
+})
+
+events.on('basket:changed', () => {
+    
 })

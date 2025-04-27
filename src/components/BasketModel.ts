@@ -15,6 +15,6 @@ export class BasketModel implements IBasketModel {
         }
 
         remove(id: string) {
-            // this.items = this.items.filter(item => item.id !== id);
+            this.items = this.items.filter(item => item.id !== id);
         }
 }
