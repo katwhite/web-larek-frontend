@@ -2,19 +2,6 @@ import {formatNumber} from "../utils/utils";
 import { IEvents } from "./base/events";
 import {IProduct, ICardsData} from "../types";
 
-// export type CatalogChangeEvent = {
-//     catalog: ProductItem[];
-// };
-
-// export class ProductItem implements IProduct {
-//     description: string;
-//     protected _id: string;
-//     image: string;
-//     title: string;
-//     price: number;
-//     category: string;
-// }
-
 export class CardsData implements ICardsData {
     protected _cards: IProduct[];
     protected _preview: string | null;

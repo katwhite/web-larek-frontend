@@ -17,7 +17,6 @@ export interface ICardsData {
 
 export interface IBasketModel {
     items: IBasketItem[];
-    // items: Map<string, number>;
     add(product: IProduct): void;
     remove(id: string, price: number): void;
 }

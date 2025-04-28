@@ -62,19 +62,16 @@ export interface IProduct {
 export interface ICardsData {
 	cards: IProduct[];
 	preview: string | null;
-	addCard(card: IProduct): void;
-	deleteCard(cardId: string, payload: Function | null): void;
 	getCard(cardId: string): IProduct;
-	checkValidation(data: Record<keyof TCardInfo, string>): boolean;
 }
 ```
 
 Модель для хранения списка покупок в корзине
 ```
-export interface IBasket {
-    items: Map<string, number>;
-    add(id: string): void;
-    remove(id: string): void;
+export interface IBasketModel {
+    items: IBasketItem[];
+    add(product: IProduct): void;
+    remove(id: string, price: number): void;
 }
 ```
 
@@ -149,17 +146,17 @@ export interface IOrderResult {
 сеттер и геттер массива карточек и превью
 - `getCard(cardId: string): ICard` - возвращает карточку по её айди
 
-#### Класс Basket?
+#### Класс BasketModel
 
 Отвечает за хранение списка покупок.\
-Конструктор принимает DOM элемент списка по селектору - cейчас это `.basket__list`\
+Конструктор принимает брокер событий.\
 Поля класса:
-- `items: Map<string, number>` - массив объектов карточек
-- `basketPrice: number` - общая стоимость
+- `items: IBasketItem[]` - массив объектов карточек
+- `protected _total: number;` - общая стоимость
 
-Есть геттер и сеттер общей стоимости и следующие методы:
-- `add(id: string): void` - добавляет товар в корзину
-- `remove(id: string): void` - удаляет товар из корзины
+Есть геттер и сеттер общей стоимости и методы:
+- `add(product: IProduct): void` - добавляет товар в корзину, меняет стоимость
+- `remove(id: string, price: number): void` - удаляет товар из корзины, меняет стоимость
 
 #### Класс UserInfo?
 
@@ -190,62 +187,37 @@ export interface IOrderResult {
 
 #### Класс Card
 
-Расширяет Component. Отвечает за отображение одной карточки. В конструктор передаётся брокер событий и темплейт.\
+Расширяет Component. Отвечает за отображение одной карточки в любом виде. В конструктор передаётся брокер событий и темплейт.\
 Поля:
-- `id`
-- `title`
-- `price`
-- `category`
-- `image`
-- `description`
-Есть геттер id, который возвращает id карточки, и сеттеры остальных полей используются для быстрого апдейта информации.\
-В `render` принимает объект карточки.
+- `id`, `title`, `price` - обязательные поля
+- `category`, `image`, `description` - необязательные поля
 
-#### Класс BasketItemView
+Есть геттер id, который возвращает id карточки, и сеттеры остальных полей, которые используются для быстрого апдейта информации.\
+В `render` принимает объект карточки в виде `data: Partial<IProduct>`, и если есть категория, отображает её в соответствии с массивом css-классов.
 
-Расширяет Component. Отвечает за отрисовку элемента корзины. Принимает в конструктор селектор и брокер событий. Имеет метод `render`, отрисовывающий карточку по айди
+#### Класс Basket
 
-#### Класс BasketView
+Отвечает за отображение корзины со списком покупок.\
+Конструктор принимает DOM элемент списка по селектору и брокер событий.\
+Поля класса:
+- `protected _list: HTMLElement` - элемент списка
+- `protected _total: HTMLElement` - элемент общей стоимости
+- `protected _button: HTMLElement` - элемент кнопки открытия формы заказа
 
-Расширяет Component. Отвечает за отрисовку всей корзины. В конструктор принимает контейнер, а в метод `render` - список товаров
+На все эти поля есть сеттеры.
 
 #### Класс Modal
 
-Расширяет Component. Отвечает за отображение модального окна, имеет слушатели для закрытия на клавиатуре на Esc, на оверлее по клику, и на кнопке крестика по клику
-Конструктор принимает селектор с айди из темплейта и брокер событий
+Расширяет Component. Отвечает за отображение модального окна, имеет слушатели для закрытия на оверлее по клику и на кнопке крестика по клику
+Конструктор принимает селектор и брокер событий
 
 Имеет поля:
-- `modal: HTMLElement` - элемент модального окна
-- `events: IEvents` - события
-- `button: HTMLButtonElement | null` - элемент кнопки, на которую будем вешать слушатели; в макете у всех модалок есть кнопка, но в будущем может появиться окно без неё
+- `protected _closeButton: HTMLButtonElement`
+- `protected _content: HTMLElement`
 
-Методы:
+Так же сеттер контента, который мы передаём в метод `render`, и методы:
 - `open(): void`
 - `close(): void`
-
-#### Класс ModalWithCard
-
-Расширяет класс Modal. Реализует модальное окно с полным отображением карточки.\
-Содержит поля:
-- `card: ICard` - отображаемая карточка - нужно брать темплейт card-preview
-
-Методы:
-- `open(id: string)` - для открытия модального окна с карточкой по айди
-
-#### Класс ModalWithForm
-
-Расширяет класс Modal. Реализует модальное окно с формой.\
-Содержит поля:
-- `errors: Record<string, HTMLElement>` - элементы для отображения ошибок валидации, привязан к name инпутов
-- `inputs: NodeListOf<HTMLInputElement>` - коллекция полей ввода 
-
-Методы:
-- `setValid(): boolean` - делает кнопку активной или неактивной
-- `getInputValues(): Record<string, string>` - возвращает объект с данными из полей ввода формы. Ключ - name инпута, значение - введённые данные
-- `setInputValues(data: Record<string, string>): void` - позволяет заполинть поля принятыми данными; в макете такого нет, но пригодится при расширении проекта
-- `setError(data: {field: string, value: string, validInformation: string}): void` - принимает объект с сообщениями об ошибках и нужными полями
-- `showInputError(field: string, errorMessage: string): void` - отображает нужное сообщение об ошибке под выбранным полем
-- `hideInputError(field: string): void` - убирает сообщение об ошибке под выбранным полем
 
 #### Класс Form
 
@@ -262,18 +234,6 @@ export interface IOrderResult {
 #### Класс Order
 
 Расширяет Form. Имеет сеттеры email, phone, address, payment.
-
-#### Класс ModalWithConfirm
-
-Расширяет класс Modal. Реализует модальное окно с подтверждением заказа.\
-Содержит поля:
-- `price: number` - общая цена
-
-#### Класс ModalWithBasket
-
-Расширяет класс Modal. Реализует модальное окно с корзиной.\
-Содержит поля:
-- `cardItem: IBasketItem` - берёт темплейт card-basket
 
 ### Слой коммуникации
 
