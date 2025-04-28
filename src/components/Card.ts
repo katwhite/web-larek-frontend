@@ -50,11 +50,18 @@ export class Card<T> extends Component<ICard<T>> {
                     evt.stopPropagation();
                 });
             else
-                this._button.addEventListener('click', () => {this.events.emit('card:add', {cardId: this.id})});
+                this._button.addEventListener('click', () => {
+                    this.events.emit('card:add', {cardId: this.id});
+                    });
         } else {
             container.addEventListener('click', () => {this.events.emit('card:select', {cardId: this.id})});
         }
 
+    }
+
+    set button(state: boolean) {
+        if (state) this.setDisabled(this._button, true);
+        else this.setDisabled(this._button, false);
     }
 
     get id(): string {
@@ -80,7 +87,10 @@ export class Card<T> extends Component<ICard<T>> {
     set price(price: string | null) {
         if (price)
         this.setText(this._price, `${price} синапсов`);
-        else this.setText(this._price, `бесценно`);
+        else {
+            this.setText(this._price, `бесценно`);
+            this.setDisabled(this._button, true);
+        }
     }
 
     set category(category: string) {

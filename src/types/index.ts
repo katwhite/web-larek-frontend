@@ -19,7 +19,7 @@ export interface IBasketModel {
     items: IBasketItem[];
     // items: Map<string, number>;
     add(product: IProduct): void;
-    remove(id: string): void;
+    remove(id: string, price: number): void;
 }
 
 export type IBasketItem = Pick<IProduct, 'id' | 'title' | 'price'>;

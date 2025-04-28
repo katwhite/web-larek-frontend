@@ -10,11 +10,13 @@
     padding: 0;
     margin: 0;
     flex-grow: 1;
+    counter-reset: basket-counter 0;
   }
 
   &__item {
     border-bottom: 1px solid $primary;
     padding: 1.5rem 0;
+    counter-increment: basket-counter 1;
 
     &-index {
       @include mixins.flex(row);
@@ -27,6 +29,10 @@
       background-color: $primary;
       color: white;
       margin-right: 1rem;
+
+      &::before {
+        content: counter(basket-counter);
+      }
     }
 
     &-delete {

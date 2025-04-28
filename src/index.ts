@@ -55,6 +55,8 @@ events.on('initialData:loaded', () => {
 
 events.on<{ cardId: string }>('card:select', ({cardId}) => {
     const cardInstant = new Card('card', cloneTemplate(cardPreviewTemplate), events);
+    if (basketData.items.some(item => item.id === cardId)) cardInstant.button = true;
+    else cardInstant.button = false;
     modal.render({content: cardInstant.render(cardsData.getCard(cardId))});
 })
 
@@ -62,13 +64,14 @@ const basketData = new BasketModel(events);
 
 events.on<{ cardId: string }>('card:add', ({cardId}) => {
     basketData.add(cardsData.getCard(cardId));
-    console.log(basketData);
+    page.counter = basketData.items.length;
+    modal.close();
 })
 
 events.on<{ cardId: string }>('card:delete', ({cardId}) => {
-    basketData.remove(cardId);
+    basketData.remove(cardId, cardsData.getCard(cardId).price);
+    page.counter = basketData.items.length;
     events.emit('basket:open');
-    // console.log(basketData);
 })
 
 const basket = new Basket(cloneTemplate(basketTemplate), events);
@@ -78,9 +81,21 @@ events.on('basket:open', () => {
         const cardInstant = new Card('card', cloneTemplate(cardBasketTemplate), events);
         return cardInstant.render(card);
     });
+    if (basketData.items.length === 0) {
+        basket.button = true;
+        basket.total = 0;
+    }
+    else {
+        basket.button = false;
+        basket.total = basketData.total;
+    }
     modal.render({content: basket.render({items: cardsArray})});
 })
 
-events.on('basket:changed', () => {
-    
-})
+events.on('modal:open', () => {
+    page.locked = true;
+});
+
+events.on('modal:close', () => {
+    page.locked = false;
+});
