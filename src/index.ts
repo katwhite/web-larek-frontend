@@ -185,17 +185,18 @@ events.on('contacts:submit', () => {
         payment: 'card',
         items: basketData.items,
         total: basketData.total,
-        }
-        modal.render({content: success.render({total: basketData.total})});
-        // api.orderProducts(orderData)
-        // .then( (res) => {
-        //   basketData.clearBasket();
-        // //   userModel.clearData();
-        //   modal.render({content: success.render({total: res.total})});
-        // })
-        // .catch((err) => {
-        //     console.error(err);
-        // }); 
+    }
+    success.setTotal(basketData.total);
+    modal.render({content: success.render()});
+    // api.orderProducts(orderData)
+    // .then( (res) => {
+    //   basketData.clearBasket();
+    // //   userModel.clearData();
+    //   modal.render({content: success.render({total: res.total})});
+    // })
+    // .catch((err) => {
+    //     console.error(err);
+    // }); 
 })
 
 events.on('modal:open', () => {
