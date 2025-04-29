@@ -29,4 +29,8 @@ export class BasketModel implements IBasketModel {
         get total() {
             return this._total;
         }
+
+        clearBasket() {
+            this.items = [];
+        }
 }

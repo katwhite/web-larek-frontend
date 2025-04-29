@@ -19,6 +19,7 @@ export interface IBasketModel {
     items: IBasketItem[];
     add(product: IProduct): void;
     remove(id: string, price: number): void;
+    clearBasket(): void;
 }
 
 export type IBasketItem = Pick<IProduct, 'id' | 'title' | 'price'>;
@@ -27,13 +28,15 @@ export interface IOrderForm {
     email: string;
     phone: string;
     address: string;
-    payment: 'Онлайн' | 'При получении';
-    checkValidation(data: Record<keyof IOrderForm, string>): boolean;
+    payment: string;
+    // checkValidation(data: Record<keyof IOrderForm, string>): boolean;
 }
 
 export interface IOrder extends IOrderForm {
-    items: string[]
+    items: IBasketItem[]
 }
+
+export type FormErrors = Partial<Record<keyof IOrder, string>>;
 
 export interface IOrderResult {
     id: string;
@@ -47,3 +50,5 @@ export interface IView {
 export interface IViewConstructor {
     new (container: HTMLElement, events?: IEvents): IView;
 }
+
+export type Payment = 'cash' | 'card';

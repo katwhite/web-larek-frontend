@@ -1,6 +1,7 @@
-import {Component} from "./base/Component";
-import {IEvents} from "./base/events";
-import {ensureElement} from "./../utils/utils";
+import {Component} from "./Component";
+import {IEvents} from "./events";
+import {ensureElement} from "../../utils/utils";
+import { IOrderForm } from "../../types";
 
 interface IFormState {
     valid: boolean;
@@ -28,12 +29,13 @@ export class Form<T> extends Component<IFormState> {
             e.preventDefault();
             this.events.emit(`${this.container.name}:submit`);
         });
+        
     }
 
     protected onInputChange(field: keyof T, value: string) {
         this.events.emit(`${this.container.name}.${String(field)}:change`, {
-            field,
-            value
+            field: field,
+            value: value
         });
     }
 
@@ -50,6 +52,5 @@ export class Form<T> extends Component<IFormState> {
         super.render({valid, errors});
         Object.assign(this, inputs);
         return this.container;
-
     }
 }
