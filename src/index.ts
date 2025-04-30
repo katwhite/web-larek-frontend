@@ -68,32 +68,33 @@ const basketData = new BasketModel(events);
 
 events.on<{ cardId: string }>('card:add', ({cardId}) => {
     basketData.add(cardsData.getCard(cardId));
-    page.counter = basketData.items.length;
     modal.close();
 })
 
 events.on<{ cardId: string }>('card:delete', ({cardId}) => {
     basketData.remove(cardId, cardsData.getCard(cardId).price);
-    page.counter = basketData.items.length;
-    events.emit('basket:open');
 })
 
 const basket = new Basket(cloneTemplate(basketTemplate), events);
 
-events.on('basket:open', () => {
+events.on('basket:changed', () => {
     const cardsArray = basketData.items.map((card) => {
         const cardInstant = new Card('card', cloneTemplate(cardBasketTemplate), events);
         return cardInstant.render(card);
     });
+    basket.total = basketData.getTotal();
+    page.counter = basketData.items.length;
+    basket.render({items: cardsArray});
+})
+
+events.on('basket:open', () => {
     if (basketData.items.length === 0) {
         basket.button = true;
-        basket.total = 0;
     }
     else {
         basket.button = false;
-        basket.total = basketData.total;
     }
-    modal.render({content: basket.render({items: cardsArray})});
+    modal.render({content: basket.render()});
 })
 
 const orderForm = new OrderForm(cloneTemplate(orderFormTemplate), events);
@@ -105,9 +106,9 @@ events.on('order:open', () => {
     })
 })
 
-events.on<{ field: string, value: string }>('order.address:change', ({field, value}) => {
+events.on('order.address:change', (data: {value: string}) => {
     orderForm.valid = orderForm.checkValidation();
-    userModel.changeAddress(value);
+    userModel.changeAddress(data.value);
 })
 
 events.on('payment:change', (data: { payment: Payment }) => {
@@ -144,8 +145,8 @@ events.on('order:submit', () => {
     })
 })
 
-events.on('contacts.phone:change', (data: { phone: string }) => {
-    userModel.changePhone(data.phone);
+events.on('contacts.phone:change', (data: { value: string }) => {
+    userModel.changePhone(data.value);
     contactsForm.valid = contactsForm.checkValidation();
 })
 
@@ -157,8 +158,8 @@ events.on('phone:changed', () => {
     });
 })
 
-events.on('contacts.email:change', (data: { email: string }) => {
-    userModel.changeEmail(data.email);
+events.on('contacts.email:change', (data: { value: string }) => {
+    userModel.changeEmail(data.value);
     contactsForm.valid = contactsForm.checkValidation();
 })
 
@@ -171,23 +172,21 @@ events.on('email:changed', () => {
 })
 
 const success = new Success(cloneTemplate(successTemplate), {onClick: () => {
-
+    basketData.clearBasket();
+    userModel.clearUserInfo();
+    basket.total = 0;
+    console.log('закрыли')
 }
 });
 
 events.on('contacts:submit', () => {
-    console.log(basketData.total);
+    console.log(userModel.getUserInfo());
     const orderData = {
         ... userModel.getUserInfo(),
-        email: '',
-        phone: '',
-        address: '',
-        payment: 'card',
-        items: basketData.items,
-        total: basketData.total,
-    }
-    success.setTotal(basketData.total);
-    modal.render({content: success.render()});
+        items: basketData.items
+    };
+    success.setTotal(basketData.getTotal());
+    // modal.render({content: success.render()});
     // api.orderProducts(orderData)
     // .then( (res) => {
     //   basketData.clearBasket();

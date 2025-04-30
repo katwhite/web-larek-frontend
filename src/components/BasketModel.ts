@@ -2,32 +2,36 @@ import { IBasketItem, IBasketModel, IProduct } from "../types";
 import { IEvents } from "./base/events";
 
 export class BasketModel implements IBasketModel {
-        items: IBasketItem[];
-        protected _total: number;
+        protected _items: IBasketItem[];
         protected events: IEvents;
         
         constructor (events: IEvents) {
             this.items = [];
-            this.total = 0;
             this.events = events;
         }
 
-        set total(number:number) {
-            this._total = number;
+        set items(items: IBasketItem[]) {
+            this._items = items;
+        }
+
+        get items() {
+            return this._items;
         }
 
         add(product: IProduct) {
             this.items.push(product);
-            this.total += product.price;
+            this.events.emit('basket:changed')
         }
 
         remove(id: string, price: number) {
             this.items = this.items.filter(item => item.id !== id);
-            this.total -= price;
+            this.events.emit('basket:changed')
         }
 
-        get total() {
-            return this._total;
+        getTotal() {
+            let total = 0;
+            this._items.forEach((item) => total += item.price);
+            return total;
         }
 
         clearBasket() {

@@ -29,7 +29,6 @@ export interface IOrderForm {
     phone: string;
     address: string;
     payment: string;
-    // checkValidation(data: Record<keyof IOrderForm, string>): boolean;
 }
 
 export interface IOrder extends IOrderForm {

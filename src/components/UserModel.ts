@@ -11,7 +11,7 @@ export class UserModel implements IUserData {
     protected email: string;
     protected phone: string;
     protected address: string;
-    protected payment: Payment;
+    protected payment: Payment | '';
     events: IEvents;
     formErrors: FormErrors = {};
 
@@ -26,7 +26,7 @@ export class UserModel implements IUserData {
         }
         this.payment = payment;
         this.events.emit('payment:changed');
-        console.log(this.payment);
+        // console.log(this.payment);
     }
 
     changeAddress(address: string) {
@@ -104,6 +104,13 @@ export class UserModel implements IUserData {
             'payment': this.payment,
         };
         return userInfo;
+    }
+
+    clearUserInfo() {
+        this.address = '';
+        this.email = '';
+        this.phone = '';
+        this.payment = '';
     }
 
     validateOrder() {

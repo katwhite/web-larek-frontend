@@ -13,7 +13,7 @@ export class OrderForm extends Form<IOrderForm> {
     
     constructor(container: HTMLFormElement, events: IEvents) {
         super(container, events);
-        this.paymentOptions = ensureAllElements<HTMLButtonElement>('.button', this.container);
+        this.paymentOptions = ensureAllElements<HTMLButtonElement>('.button[type=button]', this.container);
 
         this.paymentOptions.forEach((button) => {
             button.addEventListener('click', () => {
@@ -29,13 +29,11 @@ export class OrderForm extends Form<IOrderForm> {
     set payment(payment: string){
         this.paymentOptions.forEach((button) => {
             if (button.name === payment) {
-                // const paymentOption = this.container.elements.namedItem(`${payment}`);
                 this.toggleClass(button, 'button_alt-active', true);
             }
             else this.toggleClass(button, 'button_alt-active', false);
         });
-        this.paymentChosen = true;
-        
+        this.paymentChosen = true; // TODO: убрать, перенести в нормальную валидацию потом
     }
 
     set address(value: string) {
