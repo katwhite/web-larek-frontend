@@ -7,7 +7,7 @@ import { Page } from './components/Page';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { Modal } from './components/Modal';
 import { Basket } from './components/Basket';
-import { IProduct, Payment } from './types';
+import { IOrderForm, IProduct, Payment } from './types';
 import { Card } from './components/Card';
 import { CardsData } from './components/CardsData';
 import { BasketModel } from './components/BasketModel';
@@ -107,13 +107,13 @@ events.on('order:open', () => {
 })
 
 events.on('order.address:change', (data: {value: string}) => {
-    orderForm.valid = orderForm.checkValidation();
+    orderForm.valid = userModel.validateOrder();
     userModel.changeAddress(data.value);
 })
 
 events.on('payment:change', (data: { payment: Payment }) => {
     userModel.changePayment(data.payment);
-    orderForm.valid = orderForm.checkValidation();
+    orderForm.valid = userModel.validateOrder();
 })
 
 events.on('payment:changed', () => {
@@ -147,7 +147,7 @@ events.on('order:submit', () => {
 
 events.on('contacts.phone:change', (data: { value: string }) => {
     userModel.changePhone(data.value);
-    contactsForm.valid = contactsForm.checkValidation();
+    contactsForm.valid = userModel.validateOrder();
 })
 
 events.on('phone:changed', () => {
@@ -160,7 +160,7 @@ events.on('phone:changed', () => {
 
 events.on('contacts.email:change', (data: { value: string }) => {
     userModel.changeEmail(data.value);
-    contactsForm.valid = contactsForm.checkValidation();
+    contactsForm.valid = userModel.validateOrder();
 })
 
 events.on('email:changed', () => {
@@ -171,31 +171,39 @@ events.on('email:changed', () => {
     });
 })
 
+events.on('formErrors:change', (errors: Partial<IOrderForm>) => {
+    const { email, phone, address, payment } = errors;
+    orderForm.valid = !address && !payment;
+    orderForm.errors = Object.values({address, payment}).filter(i => !!i).join('; ');
+    contactsForm.valid = !email && !phone;
+    contactsForm.errors = Object.values({phone, email}).filter(i => !!i).join('; ');
+});
+
 const success = new Success(cloneTemplate(successTemplate), {onClick: () => {
-    basketData.clearBasket();
-    userModel.clearUserInfo();
-    basket.total = 0;
-    console.log('закрыли')
+    modal.close();
 }
 });
 
 events.on('contacts:submit', () => {
-    console.log(userModel.getUserInfo());
+    // console.log(userModel.getUserInfo());
     const orderData = {
         ... userModel.getUserInfo(),
-        items: basketData.items
+        items: (basketData.items.map(item => {return item.id})),
+        total: basketData.getTotal()
     };
     success.setTotal(basketData.getTotal());
-    // modal.render({content: success.render()});
-    // api.orderProducts(orderData)
-    // .then( (res) => {
-    //   basketData.clearBasket();
-    // //   userModel.clearData();
-    //   modal.render({content: success.render({total: res.total})});
-    // })
-    // .catch((err) => {
-    //     console.error(err);
-    // }); 
+    api.orderProducts(orderData)
+    .then( (res) => {
+      basketData.clearBasket();
+      userModel.clearUserInfo();
+      events.emit('basket:changed');
+      console.log(userModel.getUserInfo());
+    //   orderForm.reset();
+      modal.render({content: success.render({total: res.total})});
+    })
+    .catch((err) => {
+        console.error(err);
+    }); 
 })
 
 events.on('modal:open', () => {

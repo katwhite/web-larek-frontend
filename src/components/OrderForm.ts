@@ -40,10 +40,4 @@ export class OrderForm extends Form<IOrderForm> {
         this.addressInput.value = value;
     }
 
-    checkValidation() {
-        if (this.addressInput.value === '') return false;
-        if (!this.paymentChosen) return false;
-        else return true;
-    }
-
 }

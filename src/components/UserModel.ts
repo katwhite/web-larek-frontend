@@ -26,7 +26,6 @@ export class UserModel implements IUserData {
         }
         this.payment = payment;
         this.events.emit('payment:changed');
-        // console.log(this.payment);
     }
 
     changeAddress(address: string) {
@@ -60,50 +59,17 @@ export class UserModel implements IUserData {
         return this.email;
     }
 
-    // set email(data: string) {
-    //     this._email = data;
-    // }
-
-    // set phone(data: string) {
-    //     this._phone = data;
-    // }
-
-    // set address(data: string) {
-    //     this._address = data;
-    // }
-
-    // set payment(data: string) {
-    //     this._payment = data;
-    // }
-
-    // get email() {
-    //     return this._email;
-    // }
-
-    // get phone() {
-    //     return this._phone;
-    // }
-
-    // get address() {
-    //     return this._address;
-    // }
-
-    // get payment() {
-    //     return this._payment;
-    // }
-
     protected isPayment(x: string): x is Payment {
         return ['cash', 'card'].includes(x);
     }
 
-    getUserInfo() {
-        const userInfo: Record<string, string> = {
+    getUserInfo(): IOrderForm {
+        return {
             'email': this.email,
             'phone': this.phone,
             'address': this.address,
             'payment': this.payment,
         };
-        return userInfo;
     }
 
     clearUserInfo() {
@@ -125,7 +91,7 @@ export class UserModel implements IUserData {
             errors.address = 'Необходимо указать адрес';
         }
         if (!this.payment) {
-            errors.payment = 'Необходимо указать адрес';
+            errors.payment = 'Необходимо выбрать тип оплаты';
         }
         this.formErrors = errors;
         this.events.emit('formErrors:change', this.formErrors);

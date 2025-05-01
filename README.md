@@ -87,8 +87,7 @@ export interface IOrderForm {
     email: string;
     phone: string;
     address: string;
-    payment: 'Онлайн' | 'При получении';
-    checkValidation(data: Record<keyof IOrderForm, string>): boolean;
+    payment: string;
 }
 ```
 
@@ -97,6 +96,19 @@ export interface IOrderForm {
 export interface IOrderResult {
     price: number;
 }
+```
+
+Данные, отправляемые на сервер при заказе
+```
+export interface IOrder extends IOrderForm {
+    items: string[],
+    total: number
+}
+```
+
+Тип видов оплаты
+```
+export type Payment = 'cash' | 'card';
 ```
 
 ## Архитектура приложения
@@ -129,7 +141,6 @@ export interface IOrderResult {
 
 Расширяет Api. В конструктор добавляется базовый url для загрузки контента.\
 Методы:
-- `getProductItem(id: string): Promise<IProduct>` - 
 - `getProductList(): Promise<IProduct[]>` - возвращает промис с массивом всех товаров
 - `orderProducts(order: IOrder): Promise<IOrderResult>` - отправляет заказ на сервер
 
@@ -159,7 +170,21 @@ export interface IOrderResult {
 - `remove(id: string, price: number): void` - удаляет товар из корзины, меняет стоимость
 - `clearBasket(): void` - очищает корзину
 
-#### Класс UserInfo?
+#### Класс UserModel
+
+Отвечает за хранение и изменение данных пользователя.\
+Имеет поля:
+- `email`
+- `phone`
+- `address`
+- `payment`
+И методы:
+- `changePayment(payment: Payment)`
+- `changeAddress(address: string)`
+- `changePhone(phone: string)`
+- `changeEmail(email: string)` - для изменений соответствующих полей
+- `isPayment(x: string): x is Payment` - метод для проверки на принадлежность типу оплаты
+- `clearUserInfo()` - обнуляет данные
 
 ### Слой представления
 
@@ -232,9 +257,13 @@ export interface IOrderResult {
 - `checkValidation(data: Record<keyof IOrderForm, string>): boolean`
 - `onInputChange(field: keyof T, value: string)`
 
-#### Класс Order
+#### Класс OrderForm
 
-Расширяет Form. Имеет сеттеры email, phone, address, payment.
+Расширяет Form. Имеет сеттеры address, payment.
+
+#### Класс ContactsForm
+
+Расширяет Form. Имеет сеттеры email, phone.
 
 ### Слой коммуникации
 
@@ -247,14 +276,13 @@ export interface IOrderResult {
 - `card:delete` - удаление карточки из корзины
 
 *События взаимодействия с интерфейсом:*
-- `card:open` - открытие модального окна с карточкой
+- `basket:changed` - событие изменения содержимого корзины
 - `basket:open` - открытие модального окна с корзиной
 - `order:open` - открытие модального окна с формой адреса при нажатии кнопки "оформить"
 - `order:submit` - открытие модального окна с формой средств связи при нажатии кнопки "далее"
-- `phoneForm:submit` - отправка формы и открытие модального окна с подтверждением заказа при нажатии кнопки "оплатить"
-- `modal:close` - событие при нажатии кнопки "за новыми покупками"
+- `contacts:submit` - отправка формы и открытие модального окна с подтверждением заказа при нажатии кнопки "оплатить"
+- `modal:open` - событие открытия модального окна
+- `modal:close` - событие закрытия модального окна
 - `card:select` - выбор карточки для открытия в модальном окне
-- `addressForm:input` - изменение данных в форме адреса
-- `phoneForm:input` - изменение данных в форме средств связи
-- `addressForm:validation` - событие, говорящее о необходимости валидации формы адреса
-- `phoneForm:validation` - событие, говорящее о необходимости валидации формы средств связи
+- `email/phone/payment/address: changed` - событие, говорящее что соответствующие данные записаны в модель
+- `[имя формы].email/phone/payment/address: change` - событие при изменении соответствующих полей в формах

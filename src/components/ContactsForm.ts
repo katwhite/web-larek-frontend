@@ -22,9 +22,4 @@ export class ContactsForm extends Form<IOrderForm> {
         this.emailInput.value = value;
     }
 
-    checkValidation() {
-        if (this.phoneInput.value === '') return false;
-        if (this.emailInput.value === '') return false;
-        else return true;
-    }
 }

@@ -32,7 +32,8 @@ export interface IOrderForm {
 }
 
 export interface IOrder extends IOrderForm {
-    items: IBasketItem[]
+    items: string[],
+    total: number
 }
 
 export type FormErrors = Partial<Record<keyof IOrder, string>>;
@@ -40,14 +41,6 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 export interface IOrderResult {
     id: string;
     total: number;
-}
-
-export interface IView {
-    render (data?: object): HTMLElement;
-}
-
-export interface IViewConstructor {
-    new (container: HTMLElement, events?: IEvents): IView;
 }
 
 export type Payment = 'cash' | 'card';
