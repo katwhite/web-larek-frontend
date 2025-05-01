@@ -9,7 +9,7 @@ interface IUserData {
     getEmail(): string;
     getUserInfo(): IOrderForm;
     clearUserInfo(): void;
-    validateOrder(): Object;
+    validateOrder(): boolean;
 }
 
 
