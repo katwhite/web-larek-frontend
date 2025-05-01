@@ -1,15 +1,12 @@
 import {Form} from "./base/Form";
 import {IOrderForm} from "../types";
-import {EventEmitter, IEvents} from "./base/events";
-import {ensureAllElements, ensureElement} from "../utils/utils";
+import {IEvents} from "./base/events";
+import {ensureAllElements} from "../utils/utils";
 
 export class OrderForm extends Form<IOrderForm> {
 
     protected paymentOptions: HTMLButtonElement[];
-    protected paymentChosen = false;
     protected addressInput: HTMLInputElement;
-    // protected cashPayment: HTMLButtonElement;
-    // protected cardPayment: HTMLButtonElement;
     
     constructor(container: HTMLFormElement, events: IEvents) {
         super(container, events);
@@ -17,7 +14,6 @@ export class OrderForm extends Form<IOrderForm> {
 
         this.paymentOptions.forEach((button) => {
             button.addEventListener('click', () => {
-                // this.onInputChange(this.container, button.name);
               this.events.emit('payment:change', { payment: button.name });
             });
           });
@@ -33,7 +29,6 @@ export class OrderForm extends Form<IOrderForm> {
             }
             else this.toggleClass(button, 'button_alt-active', false);
         });
-        this.paymentChosen = true; // TODO: убрать, перенести в нормальную валидацию потом
     }
 
     set address(value: string) {

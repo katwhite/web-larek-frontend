@@ -102,44 +102,42 @@ const contactsForm = new ContactsForm(cloneTemplate(contactsFormTemplate), event
 const userModel = new UserModel(events);
 
 events.on('order:open', () => {
-    modal.render({content: orderForm.render({valid: false, errors: []})
+    modal.render({content: orderForm.render({
+        valid: userModel.validateOrder(), 
+        errors: []
+        })
     })
 })
 
 events.on('order.address:change', (data: {value: string}) => {
-    orderForm.valid = userModel.validateOrder();
     userModel.changeAddress(data.value);
-})
-
-events.on('payment:change', (data: { payment: Payment }) => {
-    userModel.changePayment(data.payment);
-    orderForm.valid = userModel.validateOrder();
-})
-
-events.on('payment:changed', () => {
-    orderForm.render({
-        valid: true,
-        errors: [],
-        payment: userModel.getPayment()
-    });
+    userModel.validateOrder();
 })
 
 events.on('address:changed', () => {
     orderForm.render({
-        valid: true,
+        valid: userModel.validateOrder(),
         errors: [],
         address: userModel.getAddress()
     });
 })
 
-// events.on<{ field: string, value: string }>(/^contacts\..*:change/, ({field, value}) => {
-//     if (value) contactsForm.valid = true;
-//     else contactsForm.valid = false;
-// })
+events.on('payment:change', (data: { payment: Payment }) => {
+    userModel.changePayment(data.payment);
+    userModel.validateOrder();
+})
+
+events.on('payment:changed', () => {
+    orderForm.render({
+        valid: userModel.validateOrder(),
+        errors: [],
+        payment: userModel.getPayment()
+    });
+})
 
 events.on('order:submit', () => {
     modal.render({content: contactsForm.render({
-            valid: false,
+            valid: userModel.validateOrder(),
             errors: []
         })
     })
@@ -152,7 +150,7 @@ events.on('contacts.phone:change', (data: { value: string }) => {
 
 events.on('phone:changed', () => {
     contactsForm.render({
-        valid: true,
+        valid: userModel.validateOrder(),
         errors: [],
         phone: userModel.getPhone()
     });
@@ -165,7 +163,7 @@ events.on('contacts.email:change', (data: { value: string }) => {
 
 events.on('email:changed', () => {
     contactsForm.render({
-        valid: true,
+        valid: userModel.validateOrder(),
         errors: [],
         email: userModel.getEmail()
     });
@@ -173,7 +171,14 @@ events.on('email:changed', () => {
 
 events.on('formErrors:change', (errors: Partial<IOrderForm>) => {
     const { email, phone, address, payment } = errors;
-    orderForm.valid = !address && !payment;
+    const isOrderValid = !address && !payment;
+    orderForm.valid = isOrderValid;
+    if (isOrderValid) orderForm.render({
+        valid: isOrderValid,
+        errors: [],
+        payment: userModel.getPayment(),
+        address: userModel.getAddress()
+    });
     orderForm.errors = Object.values({address, payment}).filter(i => !!i).join('; ');
     contactsForm.valid = !email && !phone;
     contactsForm.errors = Object.values({phone, email}).filter(i => !!i).join('; ');
@@ -185,21 +190,27 @@ const success = new Success(cloneTemplate(successTemplate), {onClick: () => {
 });
 
 events.on('contacts:submit', () => {
-    // console.log(userModel.getUserInfo());
     const orderData = {
         ... userModel.getUserInfo(),
         items: (basketData.items.map(item => {return item.id})),
         total: basketData.getTotal()
     };
-    success.setTotal(basketData.getTotal());
     api.orderProducts(orderData)
     .then( (res) => {
       basketData.clearBasket();
       userModel.clearUserInfo();
       events.emit('basket:changed');
-      console.log(userModel.getUserInfo());
-    //   orderForm.reset();
-      modal.render({content: success.render({total: res.total})});
+      orderForm.render({
+        payment: userModel.getPayment(),
+        valid: false,
+        errors: []
+      }).reset();
+      contactsForm.render({
+        valid: false,
+        errors: []
+      }).reset();
+      success.setTotal(res.total);
+      modal.render({content: success.render()});
     })
     .catch((err) => {
         console.error(err);
