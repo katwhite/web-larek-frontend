@@ -17,6 +17,10 @@ export class UserModel implements IUserData {
 
     constructor(events: IEvents) {
             this.events = events;
+            this.address = '';
+            this.email = '';
+            this.phone = '';
+            this.payment = '';
     }
 
     changePayment(payment: Payment) {

@@ -20,7 +20,18 @@ const categoryClassMap: Record<string, string> = {
     'другое': 'other',
     'дополнительное': 'additional',
     'кнопка': 'button',
-};
+}
+
+function cardDelete (this: Card<IProduct>, evt:MouseEvent) {
+    this.events.emit('card:delete', {cardId: this.id});
+    evt.stopPropagation();
+    this.setButton(false);
+}
+
+function cardAdd (this: Card<IProduct>) {
+    this.events.emit('card:add', {cardId: this.id});
+    this.setButton(true);
+}
 
 export class Card<T> extends Component<ICard<T>> {
     protected _title: HTMLElement;
@@ -28,40 +39,47 @@ export class Card<T> extends Component<ICard<T>> {
     _id: string;
     protected _image?: HTMLImageElement;
     protected _description?: HTMLElement;
-    protected _button?: HTMLButtonElement;
+    protected button?: HTMLButtonElement;
     protected _category?: HTMLButtonElement;
     protected events: IEvents;
+    protected boundCardAdd;
+    protected boundCardDelete;
 
     constructor(protected blockName: string, container: HTMLElement, events: IEvents) {
         super(container);
 
         this._title = ensureElement<HTMLElement>(`.${blockName}__title`, container);
         this._image = container.querySelector(`.${blockName}__image`);
-        this._button = container.querySelector(`.${blockName}__button`);
+        this.button = container.querySelector(`.${blockName}__button`);
         this._description = container.querySelector(`.${blockName}__text`);
         this._category = container.querySelector(`.${blockName}__category`);
         this._price = ensureElement<HTMLImageElement>(`.${blockName}__price`, container);
         this.events = events;
+        this.boundCardAdd = cardAdd.bind(this);
+        this.boundCardDelete = cardDelete.bind(this);
 
-        if (this._button) {
-            if (this._button.classList.contains('basket__item-delete'))
-                this._button.addEventListener('click', (evt) => {
-                    this.events.emit('card:delete', {cardId: this.id});
-                    evt.stopPropagation();
-                });
+        if (this.button) {
+            if (this.button.classList.contains('basket__item-delete'))
+                this.button.addEventListener('click', this.boundCardDelete);
             else
-                this._button.addEventListener('click', () => {
-                    this.events.emit('card:add', {cardId: this.id});
-                    });
+                this.button.addEventListener('click', this.boundCardAdd);
         } else {
             container.addEventListener('click', () => {this.events.emit('card:select', {cardId: this.id})});
         }
 
     }
 
-    set button(state: boolean) {
-        if (state) this.setDisabled(this._button, true);
-        else this.setDisabled(this._button, false);
+    setButton(state: boolean) {
+        if (state) {
+            this.setText(this.button, 'Удалить');
+            this.button.addEventListener('click', this.boundCardDelete);
+            this.button.removeEventListener('click', this.boundCardAdd)
+        }
+        else {
+            this.setText(this.button, 'В корзину');
+            this.button.addEventListener('click', this.boundCardAdd);
+            this.button.removeEventListener('click', this.boundCardDelete)
+        }
     }
 
     get id(): string {
@@ -89,7 +107,7 @@ export class Card<T> extends Component<ICard<T>> {
         this.setText(this._price, `${price} синапсов`);
         else {
             this.setText(this._price, `бесценно`);
-            this.setDisabled(this._button, true);
+            this.setDisabled(this.button, true);
         }
     }
 
@@ -110,56 +128,3 @@ export class Card<T> extends Component<ICard<T>> {
     }
 
 }
-
-// export type CatalogItemStatus = {
-//     status: LotStatus,
-//     label: string
-// };
-
-// export class CatalogItem extends Card<CatalogItemStatus> {
-//     protected _status: HTMLElement;
-
-//     constructor(container: HTMLElement, actions?: ICardActions) {
-//         super('card', container, actions);
-//         this._status = ensureElement<HTMLElement>(`.card__status`, container);
-//     }
-
-//     set status({ status, label }: CatalogItemStatus) {
-//         this.setText(this._status, label);
-//         this._status.className = clsx('card__status', {
-//             [bem(this.blockName, 'status', 'active').name]: status === 'active',
-//             [bem(this.blockName, 'status', 'closed').name]: status === 'closed'
-//         });
-//     }
-// }
-
-// export interface BidStatus {
-//     amount: number;
-//     status: boolean;
-// }
-
-// export class BidItem extends Card<BidStatus> {
-//     protected _amount: HTMLElement;
-//     protected _status: HTMLElement;
-//     protected _selector: HTMLInputElement;
-
-//     constructor(container: HTMLElement, actions?: ICardActions) {
-//         super('bid', container, actions);
-//         this._amount = ensureElement<HTMLElement>(`.bid__amount`, container);
-//         this._status = ensureElement<HTMLElement>(`.bid__status`, container);
-//         this._selector = container.querySelector(`.bid__selector-input`);
-
-//         if (!this._button && this._selector) {
-//             this._selector.addEventListener('change', (event: MouseEvent) => {
-//                 actions?.onClick?.(event);
-//             })
-//         }
-//     }
-
-//     set status({ amount, status }: BidStatus) {
-//         this.setText(this._amount, formatNumber(amount));
-
-//         if (status) this.setVisible(this._status);
-//         else this.setHidden(this._status);
-//     }
-// }

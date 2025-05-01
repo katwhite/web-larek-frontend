@@ -18,17 +18,8 @@ import { Success } from './components/Success';
 import { UserModel } from './components/UserModel';
 
 const events = new EventEmitter();
-events.onAll((event) => console.log(event.eventName, '; ', event.data));
-
 const cardsData = new CardsData(events);
-
 const api = new LarekAPI(CDN_URL, API_URL);
-// const appData = new AppState({}, events);
-
-events.onAll(({ eventName, data }) => {
-    console.log(eventName, data);
-})
-
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
 const cardPreviewTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
 const cardBasketTemplate = ensureElement<HTMLTemplateElement>('#card-basket');
@@ -36,18 +27,18 @@ const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
 const contactsFormTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 const orderFormTemplate = ensureElement<HTMLTemplateElement>('#order');
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
-
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
-
-api.getProductList()
-    .then((products) => {
-        cardsData.cards = products;
-    })
-    .catch((err) => {
-    console.error(err);
-    });
-
 const page = new Page(document.body, events);
+const basketData = new BasketModel(events);
+const basket = new Basket(cloneTemplate(basketTemplate), events);
+const orderForm = new OrderForm(cloneTemplate(orderFormTemplate), events);
+const contactsForm = new ContactsForm(cloneTemplate(contactsFormTemplate), events);
+const userModel = new UserModel(events);
+const success = new Success(cloneTemplate(successTemplate), {onClick: () => {modal.close();}});
+
+events.onAll(({ eventName, data }) => {
+    console.log(eventName, data);
+})
 
 events.on('initialData:loaded', () => {
     const cardsArray = cardsData.cards.map((card) => {
@@ -59,23 +50,18 @@ events.on('initialData:loaded', () => {
 
 events.on<{ cardId: string }>('card:select', ({cardId}) => {
     const cardInstant = new Card('card', cloneTemplate(cardPreviewTemplate), events);
-    if (basketData.items.some(item => item.id === cardId)) cardInstant.button = true;
-    else cardInstant.button = false;
+    if (basketData.items.some(item => item.id === cardId)) cardInstant.setButton(true);
+    else cardInstant.setButton(false);
     modal.render({content: cardInstant.render(cardsData.getCard(cardId))});
 })
 
-const basketData = new BasketModel(events);
-
 events.on<{ cardId: string }>('card:add', ({cardId}) => {
     basketData.add(cardsData.getCard(cardId));
-    modal.close();
 })
 
 events.on<{ cardId: string }>('card:delete', ({cardId}) => {
     basketData.remove(cardId, cardsData.getCard(cardId).price);
 })
-
-const basket = new Basket(cloneTemplate(basketTemplate), events);
 
 events.on('basket:changed', () => {
     const cardsArray = basketData.items.map((card) => {
@@ -84,27 +70,25 @@ events.on('basket:changed', () => {
     });
     basket.total = basketData.getTotal();
     page.counter = basketData.items.length;
-    basket.render({items: cardsArray});
-})
-
-events.on('basket:open', () => {
     if (basketData.items.length === 0) {
         basket.button = true;
     }
     else {
         basket.button = false;
     }
-    modal.render({content: basket.render()});
+    basket.render({items: cardsArray});
 })
 
-const orderForm = new OrderForm(cloneTemplate(orderFormTemplate), events);
-const contactsForm = new ContactsForm(cloneTemplate(contactsFormTemplate), events);
-const userModel = new UserModel(events);
+events.on('basket:open', () => {
+    modal.render({content: basket.render()});
+})
 
 events.on('order:open', () => {
     modal.render({content: orderForm.render({
         valid: userModel.validateOrder(), 
-        errors: []
+        errors: [],
+        payment: userModel.getPayment(),
+        address: userModel.getAddress()
         })
     })
 })
@@ -138,7 +122,9 @@ events.on('payment:changed', () => {
 events.on('order:submit', () => {
     modal.render({content: contactsForm.render({
             valid: userModel.validateOrder(),
-            errors: []
+            errors: [],
+            phone: userModel.getPhone(),
+            email: userModel.getEmail()
         })
     })
 })
@@ -184,11 +170,6 @@ events.on('formErrors:change', (errors: Partial<IOrderForm>) => {
     contactsForm.errors = Object.values({phone, email}).filter(i => !!i).join('; ');
 });
 
-const success = new Success(cloneTemplate(successTemplate), {onClick: () => {
-    modal.close();
-}
-});
-
 events.on('contacts:submit', () => {
     const orderData = {
         ... userModel.getUserInfo(),
@@ -200,15 +181,6 @@ events.on('contacts:submit', () => {
       basketData.clearBasket();
       userModel.clearUserInfo();
       events.emit('basket:changed');
-      orderForm.render({
-        payment: userModel.getPayment(),
-        valid: false,
-        errors: []
-      }).reset();
-      contactsForm.render({
-        valid: false,
-        errors: []
-      }).reset();
       success.setTotal(res.total);
       modal.render({content: success.render()});
     })
@@ -224,3 +196,11 @@ events.on('modal:open', () => {
 events.on('modal:close', () => {
     page.locked = false;
 });
+
+api.getProductList()
+    .then((products) => {
+        cardsData.cards = products;
+    })
+    .catch((err) => {
+    console.error(err);
+    });
