@@ -93,30 +93,24 @@ events.on('order:open', () => {
     })
 })
 
-events.on('order.address:change', (data: {value: string}) => {
-    userModel.changeAddress(data.value);
-    userModel.validateOrder();
+events.on(/^[a-zA-Z]+\.[a-zA-Z]+:change$/, (data: {field: keyof IOrderForm, value: string}) => {
+        userModel.changeField(data.field, data.value);
+        userModel.validateOrder();
 })
 
-events.on('address:changed', () => {
+events.on(/^user\..*:changed/, () => {
     orderForm.render({
         valid: userModel.validateOrder(),
         errors: [],
-        address: userModel.getAddress()
-    });
-})
-
-events.on('payment:change', (data: { payment: Payment }) => {
-    userModel.changePayment(data.payment);
-    userModel.validateOrder();
-})
-
-events.on('payment:changed', () => {
-    orderForm.render({
-        valid: userModel.validateOrder(),
-        errors: [],
+        address: userModel.getAddress(),
         payment: userModel.getPayment()
     });
+    contactsForm.render({
+        valid: userModel.validateOrder(),
+        errors: [],
+        phone: userModel.getPhone(),
+        email: userModel.getEmail()
+    })
 })
 
 events.on('order:submit', () => {
@@ -127,32 +121,6 @@ events.on('order:submit', () => {
             email: userModel.getEmail()
         })
     })
-})
-
-events.on('contacts.phone:change', (data: { value: string }) => {
-    userModel.changePhone(data.value);
-    contactsForm.valid = userModel.validateOrder();
-})
-
-events.on('phone:changed', () => {
-    contactsForm.render({
-        valid: userModel.validateOrder(),
-        errors: [],
-        phone: userModel.getPhone()
-    });
-})
-
-events.on('contacts.email:change', (data: { value: string }) => {
-    userModel.changeEmail(data.value);
-    contactsForm.valid = userModel.validateOrder();
-})
-
-events.on('email:changed', () => {
-    contactsForm.render({
-        valid: userModel.validateOrder(),
-        errors: [],
-        email: userModel.getEmail()
-    });
 })
 
 events.on('formErrors:change', (errors: Partial<IOrderForm>) => {

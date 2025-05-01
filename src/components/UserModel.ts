@@ -2,16 +2,22 @@ import { FormErrors, IOrder, IOrderForm, Payment } from "../types";
 import { IEvents } from "./base/events";
 
 interface IUserData {
-    changePayment: (payment: Payment) => void;
-    getPayment: () => string;
-  }
+    changeField(field: keyof IOrderForm, value: Payment | string): void;
+    getPayment(): string;
+    getAddress(): string;
+    getPhone(): string;
+    getEmail(): string;
+    getUserInfo(): IOrderForm;
+    clearUserInfo(): void;
+    validateOrder(): Object;
+}
 
 
 export class UserModel implements IUserData {
     protected email: string;
     protected phone: string;
     protected address: string;
-    protected payment: Payment | '';
+    protected payment: string;
     events: IEvents;
     formErrors: FormErrors = {};
 
@@ -23,28 +29,13 @@ export class UserModel implements IUserData {
             this.payment = '';
     }
 
-    changePayment(payment: Payment) {
-        if (!this.isPayment(payment)) {
-          alert('Invalid payment');
-          return
-        }
-        this.payment = payment;
-        this.events.emit('payment:changed');
-    }
-
-    changeAddress(address: string) {
-        this.address = address;
-        this.events.emit('address:changed');
-    }
-
-    changePhone(phone: string) {
-        this.phone = phone;
-        this.events.emit('phone:changed');
-    }
-
-    changeEmail(email: string) {
-        this.email = email;
-        this.events.emit('email:changed');
+    changeField(field: keyof IOrderForm, value: Payment | string) {
+        if (field === 'payment' && !this.isPayment(value)) {
+            alert('Invalid payment');
+            return
+          }
+        this[field] = value;
+        this.events.emit(`user.${field}:changed`);
     }
     
     getPayment() {

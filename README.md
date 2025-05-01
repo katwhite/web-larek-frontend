@@ -178,10 +178,9 @@ export type Payment = 'cash' | 'card';
 - `address`
 - `payment`
 И методы:
-- `changePayment(payment: Payment)`
-- `changeAddress(address: string)`
-- `changePhone(phone: string)`
-- `changeEmail(email: string)` - для изменений соответствующих полей
+- `changeField(field: keyof IOrderForm, value: Payment | string)` - записывает данные в переданное поле
+- `get[имя поля]` - отдают данные из модели
+- `getUserInfo(): IOrderForm` - возвращает объект со всеми данными
 - `isPayment(x: string): x is Payment` - метод для проверки на принадлежность типу оплаты
 - `clearUserInfo()` - обнуляет данные
 - `validateOrder()` - метод валидации данных, получаемых из форм
@@ -288,6 +287,6 @@ export type Payment = 'cash' | 'card';
 - `modal:open` - событие открытия модального окна
 - `modal:close` - событие закрытия модального окна
 - `card:select` - выбор карточки для открытия в модальном окне
-- `email/phone/payment/address: changed` - событие, говорящее что соответствующие данные записаны в модель
+- `user.[email/phone/payment/address]: changed` - событие, говорящее что соответствующие данные записаны в модель
 - `[имя формы].email/phone/payment/address: change` - событие при изменении соответствующих полей в формах
 - `formErrors:change` - событие валидации данных
