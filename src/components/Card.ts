@@ -3,10 +3,6 @@ import { IProduct } from "../types";
 import {bem, createElement, ensureElement, formatNumber} from "../utils/utils";
 import { IEvents } from "./base/events";
 
-interface ICardActions {
-    onClick: (event: MouseEvent) => void;
-}
-
 export interface ICard<T> {
     title: string;
     description: string;
@@ -22,17 +18,6 @@ const categoryClassMap: Record<string, string> = {
     'кнопка': 'button',
 }
 
-function cardDelete (this: Card<IProduct>, evt:MouseEvent) {
-    this.events.emit('card:delete', {cardId: this.id});
-    evt.stopPropagation();
-    this.setButton(false);
-}
-
-function cardAdd (this: Card<IProduct>) {
-    this.events.emit('card:add', {cardId: this.id});
-    this.setButton(true);
-}
-
 export class Card<T> extends Component<ICard<T>> {
     protected _title: HTMLElement;
     protected _price: HTMLElement;
@@ -42,8 +27,6 @@ export class Card<T> extends Component<ICard<T>> {
     protected button?: HTMLButtonElement;
     protected _category?: HTMLButtonElement;
     protected events: IEvents;
-    protected boundCardAdd;
-    protected boundCardDelete;
 
     constructor(protected blockName: string, container: HTMLElement, events: IEvents) {
         super(container);
@@ -55,31 +38,23 @@ export class Card<T> extends Component<ICard<T>> {
         this._category = container.querySelector(`.${blockName}__category`);
         this._price = ensureElement<HTMLImageElement>(`.${blockName}__price`, container);
         this.events = events;
-        this.boundCardAdd = cardAdd.bind(this);
-        this.boundCardDelete = cardDelete.bind(this);
 
         if (this.button) {
             if (this.button.classList.contains('basket__item-delete'))
-                this.button.addEventListener('click', this.boundCardDelete);
-            else
-                this.button.addEventListener('click', this.boundCardAdd);
+                this.button.addEventListener('click', (evt) => {
+                    this.events.emit('card:delete', {cardId: this._id})
+                    evt.stopPropagation();
+                });
         } else {
             container.addEventListener('click', () => {this.events.emit('card:select', {cardId: this.id})});
         }
 
     }
 
-    setButton(state: boolean) {
-        if (state) {
-            this.setText(this.button, 'Удалить');
-            this.button.addEventListener('click', this.boundCardDelete);
-            this.button.removeEventListener('click', this.boundCardAdd)
-        }
-        else {
-            this.setText(this.button, 'В корзину');
-            this.button.addEventListener('click', this.boundCardAdd);
-            this.button.removeEventListener('click', this.boundCardDelete)
-        }
+    setButtonListener(state: boolean, onClick: (this: Card<IProduct>)=>void) {
+        this.button.addEventListener('click', onClick.bind(this));
+        if (state) this.setText(this.button, 'Удалить');
+        else this.setText(this.button, 'В корзину');
     }
 
     get id(): string {

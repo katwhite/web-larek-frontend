@@ -50,8 +50,17 @@ events.on('initialData:loaded', () => {
 
 events.on<{ cardId: string }>('card:select', ({cardId}) => {
     const cardInstant = new Card('card', cloneTemplate(cardPreviewTemplate), events);
-    if (basketData.items.some(item => item.id === cardId)) cardInstant.setButton(true);
-    else cardInstant.setButton(false);
+    if (basketData.items.some(item => item.id === cardId)) {
+        cardInstant.setButtonListener(true, () => {
+            events.emit('card:delete', {cardId: cardId});
+            modal.close();
+    });
+    }
+    else
+        cardInstant.setButtonListener(false, () => {
+            events.emit('card:add', {cardId: cardId});
+            modal.close();
+        });
     modal.render({content: cardInstant.render(cardsData.getCard(cardId))});
 })
 
