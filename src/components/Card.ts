@@ -51,7 +51,7 @@ export class Card<T> extends Component<ICard<T>> {
 
     }
 
-    setButtonListener(state: boolean, onClick: (this: Card<IProduct>)=>void) {
+    setButtonListener(state: boolean, onClick: ()=>void) {
         this.button.addEventListener('click', onClick.bind(this));
         if (state) this.setText(this.button, 'Удалить');
         else this.setText(this.button, 'В корзину');
